@@ -10,6 +10,8 @@
 
 
 import team as team
+import base64
+import requests
 
 def printWelcome():
     print("############ Welcome to the NFL Statistic Book ############ \n\n")
@@ -26,6 +28,7 @@ def execInput(selection):
     if (selection == '1'):
         teamName = input("\nPlease enter team name or city: ")
         t = team.Team(teamName)
+        api_test()
         #Search the api for the team, determine if it is real, if it is not real, make the user enter another team name 
 
     elif (selection == '2'):
@@ -33,6 +36,11 @@ def execInput(selection):
         #get team names 
     else:
         execInput(getFirstSelection())
+
+def api_test():
+    apiUrl = "https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/full_game_schedule.json"
+    response = requests.get(apiUrl)
+    print(response.status_code)
 
 
 
