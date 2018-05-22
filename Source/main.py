@@ -7,9 +7,6 @@
 # - User can select a team and then get a variety of data about the team including roster etc, not just the schedule (for a variety of years)
 # - Eventually the ability to search for a specific player to get their stats 
 
-#To do: 
-# - Step 1 : Research vscode and github integration / python github integration 
-# - Step 2: Research python API accessing 
 
 import team as team
 
