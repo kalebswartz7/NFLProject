@@ -46,8 +46,11 @@ def generateTeams():
         print('HTTP Request failed')
 
 
-def printWelcome():
-    print("############ Welcome to the NFL Statistic Book ############ \n\n")
+def printWelcome(opening = True):
+    if (opening):
+        print("############ Welcome to the NFL Statistic Book ############ \n\n")
+    if (opening == False):
+        clear()
     print("(1) Search for a specific team")
     print("(2) Get a list of teams to choose from")
     return getFirstSelection()
@@ -61,7 +64,9 @@ def execInput(selection, toClear = True):
     if (selection == '1'):
         if (toClear):
            clear()
-        teamName = input("\nPlease enter team name: ")
+           teamName = input("Please enter team name: ")
+        else:
+            teamName = input("\nPlease enter team name: ")
         if isTeam(teamName):
             createTeam(getAbbreviation(teamName))
         else:
@@ -80,15 +85,20 @@ def execInput(selection, toClear = True):
 
 def createTeam(teamAbbreviation):
     t = Team(teamAbbreviation)
-    print(t.getName())
-
+    getTeamOptions(t)
 
 def clear():
     os.system( 'clear' )
 
 def printTeams():
+    count = 0
+    teamString = ""
     for key in allTeams:
-        print(key)
+        count = count + 1
+        teamString += key + " " * (25 - len(key))
+        if (count % 5 == 0):
+            teamString += "\n"
+    print(teamString)
 
 def isTeam(teamName):
     for key in allTeams:
@@ -100,6 +110,18 @@ def getAbbreviation(teamName):
     for key in allTeams:
         if teamName.lower() in key.lower() and len(teamName) >= 4:
             return allTeams[key]
+
+def getTeamOptions(t):
+    clear()
+    print("TEAM SELECTED: " + t.getName() + "\n\n" + "(1) Get 2018-2019 Schedule \n(2) Choose another team")
+    selection = input("\nSelection: ")
+    if (selection is '2'):
+        execInput(printWelcome(False))
+    elif (selection is '1'):
+        clear()
+        t.getSchedule(userName, passw)
+
+
 
 
 ####### Main #######

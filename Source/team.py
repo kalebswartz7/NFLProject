@@ -11,10 +11,10 @@ class Team:
     def getName(self):
         return self.name
 
-    def get_team_info(self, userName, passw):
+    def getSchedule(self, userName, passw):
         try:
             response = requests.get(
-                url="https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/full_game_schedule.json?team=CIN",
+                url="https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/full_game_schedule.json?team=" + self.getName(),
                 params={
                 #"Abbreviation": "CIN"
                 },
@@ -23,7 +23,18 @@ class Team:
                 }
             )
             data = response.json()
-            print(data['fullgameschedule']['gameentry'][0]['awayTeam'])
+            print(" 2018 Schedule: \n")
+            for i in range(0, 16):
+                date = data['fullgameschedule']['gameentry'][i]['date']
+                awayTeam = data['fullgameschedule']['gameentry'][i]['awayTeam']['City'] \
+                + " "  + data['fullgameschedule']['gameentry'][i]['awayTeam']['Name']
+                homeTeam = data['fullgameschedule']['gameentry'][i]['homeTeam']['City'] \
+                + " "  + data['fullgameschedule']['gameentry'][i]['homeTeam']['Name']
+                time = data['fullgameschedule']['gameentry'][i]['time']
+                gameData = (" " + date + " " * 10 + awayTeam + " @ " + homeTeam)
+                dataLength = len(gameData)
+                spaces = 80 - dataLength
+                print( gameData + ' ' * spaces + time)
         
         except requests.exceptions.RequestException:
             print('HTTP Request failed')
