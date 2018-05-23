@@ -8,5 +8,5 @@ What this project can do:
 
 Future: 
 - Want to give the user the ability to search for players and get their resulting stats 
-- Translate program from text-based to a full user interface
+- Translate program from text-based to a full user interface (WebApp?)
 - More :)
