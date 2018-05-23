@@ -1,18 +1,15 @@
-#Project goals: 
-# - User can input a team name -> access the API and return the team's schedule with the result of each game (2017)
-#    - #Get schedule for upcoming 2018 season 
-# - If the user asks to get all team names, print the city with name for all teams - make them then select one 
-
-#Future: 
-# - User can select a team and then get a variety of data about the team including roster etc, not just the schedule (for a variety of years)
-# - Eventually the ability to search for a specific player to get their stats 
-# - :)
+#Next Steps: 
+# - Get roster in a formatted kind of way 
+# - View players stats 
 
 
 from team import Team
 import base64
 import requests
 import os
+import sys
+
+""" Gets username and password as credentials to acccess the API - Hidden ;) """
 
 def getCredentials():
     with open('secret.txt') as f:
@@ -23,6 +20,10 @@ def getCredentials():
 userName = getCredentials()[0].strip()
 passw = getCredentials()[1].strip()
 allTeams = {}
+
+
+""" Accesses the API to get a team (City + Name) and pairs that with the team's abbreviation in a dictionary as the JSON URL's use the 
+    team's abbreviations """
 
 def generateTeams():
     try:
@@ -46,19 +47,29 @@ def generateTeams():
         print('HTTP Request failed')
 
 
+"""" This is what is first printed / asked when the program starts. This function gets called repeatedly however to give the user
+     more options after the data they want is already found. """ 
+
 def printWelcome(opening = True):
     if (opening):
         print("############ Welcome to the NFL Statistic Book ############ \n\n")
-    if (opening == False):
-        clear()
+    #if (opening == False):
+        #clear()
     print("(1) Search for a specific team")
     print("(2) Get a list of teams to choose from")
+    print("(3) Quit")
     return getFirstSelection()
+
+
+""" This method just gets the input from the user in printWelcome() """
 
 def getFirstSelection():
     selection = input("\nSelection: ")
     return selection
 
+
+""" This method takes the input from the user recieved in getFirstSelection() and decides what to do with that input depending on 
+    what the user entered """
 
 def execInput(selection, toClear = True):
     if (selection == '1'):
@@ -71,24 +82,36 @@ def execInput(selection, toClear = True):
             createTeam(getAbbreviation(teamName))
         else:
             execInput('1', False)
-        #Search the api for the team, determine if it is real, if it is not real, make the user enter another team name 
 
     elif (selection == '2'):
         clear()
         print("Available teams: \n")
         printTeams()
         execInput('1', False)
+    
+    elif (selection == '3'):
+        clear()
+        sys.exit("Have a great day")
 
-        #get team names 
+
     else:
         execInput(getFirstSelection())
+
+
+""" Creates a Team with a team's corresponding abbreviation for easy access in the API """
 
 def createTeam(teamAbbreviation):
     t = Team(teamAbbreviation)
     getTeamOptions(t)
 
+
+""" Clears window """
+
 def clear():
     os.system( 'clear' )
+
+
+""" Prints all Teams from the dictionary available to choose in the program """
 
 def printTeams():
     count = 0
@@ -100,31 +123,45 @@ def printTeams():
             teamString += "\n"
     print(teamString)
 
+
+""" Determines whether or not the user input a real team name / city """  
+
 def isTeam(teamName):
     for key in allTeams:
         if teamName.lower() in key.lower() and len(teamName) >= 4:
             return True
     return False
 
+
+""" Gets the abbreviation of a correspnding team name """ 
+
 def getAbbreviation(teamName):
     for key in allTeams:
         if teamName.lower() in key.lower() and len(teamName) >= 4:
             return allTeams[key]
 
+
+""" Once a user successfully selects a team, these new options are displayed """
+
 def getTeamOptions(t):
     clear()
-    print("TEAM SELECTED: " + t.getName() + "\n\n" + "(1) Get 2018-2019 Schedule \n(2) Choose another team")
-    selection = input("\nSelection: ")
-    if (selection is '2'):
+    print("TEAM SELECTED: " + t.getName() + "\n\n" + "(1) Get 2018-2019 Schedule\n(2) Get Roster\n(3) Choose another team ")
+    selection = input("\n Selection: ")
+    if (selection is '3'):
+        clear()
         execInput(printWelcome(False))
     elif (selection is '1'):
         clear()
         t.getSchedule(userName, passw)
+        execInput(printWelcome(False))
+    elif (selection is '2'):
+        clear()
+        t.getRoster(userName, passw)
+    
 
 
 
-
-####### Main #######
+""" Main """
 generateTeams()
 selection = printWelcome()  
 execInput(selection)  
