@@ -9,9 +9,42 @@
 # - :)
 
 
-import team as team
+from team import Team
 import base64
 import requests
+import os
+
+def getCredentials():
+    with open('secret.txt') as f:
+        lines = f.readlines()
+        return lines
+
+
+userName = getCredentials()[0].strip()
+passw = getCredentials()[1].strip()
+allTeams = {}
+
+def generateTeams():
+    try:
+        response = requests.get(
+            url="https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/conference_team_standings.json?teamstats=W,L,T,PF,PA",
+            params={
+            },
+            headers={
+                "Authorization": "Basic " + base64.b64encode('{}:{}'.format(userName,passw).encode('utf-8')).decode('ascii')
+            }
+        )
+        data = response.json()
+        for j in range(0, 2):
+            for i in range(0, 16):
+                team = (data['conferenceteamstandings']['conference'][j]['teamentry'][i]['team']['City']) + " "
+                team += (data['conferenceteamstandings']['conference'][j]['teamentry'][i]['team']['Name'])
+                abbreviation = (data['conferenceteamstandings']['conference'][j]['teamentry'][i]['team']['Abbreviation'])
+                allTeams[team] = abbreviation
+        
+    except requests.exceptions.RequestException:
+        print('HTTP Request failed')
+
 
 def printWelcome():
     print("############ Welcome to the NFL Statistic Book ############ \n\n")
@@ -20,32 +53,57 @@ def printWelcome():
     return getFirstSelection()
 
 def getFirstSelection():
-
     selection = input("\nSelection: ")
     return selection
 
-def execInput(selection):
+
+def execInput(selection, toClear = True):
     if (selection == '1'):
-        teamName = input("\nPlease enter team name or city: ")
-        t = team.Team(teamName)
-        api_test()
+        if (toClear):
+           clear()
+        teamName = input("\nPlease enter team name: ")
+        if isTeam(teamName):
+            createTeam(getAbbreviation(teamName))
+        else:
+            execInput('1', False)
         #Search the api for the team, determine if it is real, if it is not real, make the user enter another team name 
 
     elif (selection == '2'):
-        print("Team names are:")
+        clear()
+        print("Available teams: \n")
+        printTeams()
+        execInput('1', False)
+
         #get team names 
     else:
         execInput(getFirstSelection())
 
-def api_test():
-    apiUrl = "https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/full_game_schedule.json"
-    response = requests.get(apiUrl)
-    print(response.status_code)
+def createTeam(teamAbbreviation):
+    t = Team(teamAbbreviation)
+    print(t.getName())
 
 
+def clear():
+    os.system( 'clear' )
+
+def printTeams():
+    for key in allTeams:
+        print(key)
+
+def isTeam(teamName):
+    for key in allTeams:
+        if teamName.lower() in key.lower() and len(teamName) >= 4:
+            return True
+    return False
+
+def getAbbreviation(teamName):
+    for key in allTeams:
+        if teamName.lower() in key.lower() and len(teamName) >= 4:
+            return allTeams[key]
 
 
 ####### Main #######
-
+generateTeams()
 selection = printWelcome()  
 execInput(selection)  
+
