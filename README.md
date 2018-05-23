@@ -1,7 +1,7 @@
 # NFLProject
 NFL Personal Project - Accessing an API (Python) 
 
-What this program can do: 
+What this project can do: 
 - Accesses the MySportsFeed API to get all data 
 - User can view any NFL team's upcoming 2018 schedule 
 - User can view any NFL team's current roster (API will hopefully be updated with post-draft rosters soon) 
