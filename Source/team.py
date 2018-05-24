@@ -52,6 +52,8 @@ class Team:
             print('HTTP Request failed')
 
 
+    """ Gets a specific team's roster """
+
     def getRoster(self, userName, passw, position = 'QB'):
         try:
             response = requests.get(
@@ -72,7 +74,10 @@ class Team:
             print(positionPrint)
             self.count = self.count + 1
             if (self.count < 14):
-                self.getRoster(userName, passw, self.positions[self.count])
+                try:
+                    self.getRoster(userName, passw, self.positions[self.count])
+                except:
+                    self.count = self.count + 1
 
 
         except requests.exceptions.RequestException:
