@@ -20,6 +20,7 @@ def getCredentials():
 userName = getCredentials()[0].strip()
 passw = getCredentials()[1].strip()
 allTeams = {}
+createdTeam = "Bengals"
 
 
 """ Accesses the API to get a team (City + Name) and pairs that with the team's abbreviation in a dictionary as the JSON URL's use the 
@@ -50,11 +51,12 @@ def generateTeams():
 """" This is what is first printed / asked when the program starts. This function gets called repeatedly however to give the user
      more options after the data they want is already found. """ 
 
-def printWelcome(opening = True):
+def printWelcome(opening = True, currentTeam = False):
     if (opening):
         print("############ Welcome to the NFL Statistic Book ############ \n\n")
-    #if (opening == False):
-        #clear()
+    if (currentTeam == True):
+        print("(0) Stay with current team")
+
     print("(1) Search for a specific team")
     print("(2) Get a list of teams to choose from")
     print("(3) Quit")
@@ -71,7 +73,7 @@ def getFirstSelection():
 """ This method takes the input from the user recieved in getFirstSelection() and decides what to do with that input depending on 
     what the user entered """
 
-def execInput(selection, toClear = True):
+def execInput(selection, toClear = True, currentTeam = False):
     if (selection == '1'):
         if (toClear):
            clear()
@@ -79,9 +81,17 @@ def execInput(selection, toClear = True):
         else:
             teamName = input("\nPlease enter team name: ")
         if isTeam(teamName):
+            global createdTeam
+            createdTeam = teamName
             createTeam(getAbbreviation(teamName))
+            
         else:
             execInput('1', False)
+
+    elif (selection == '0' and currentTeam == True):
+        print(createdTeam)
+        if isTeam(createdTeam):
+            createTeam(getAbbreviation(createdTeam))
 
     elif (selection == '2'):
         clear()
@@ -153,10 +163,12 @@ def getTeamOptions(t):
     elif (selection is '1'):
         clear()
         t.getSchedule(userName, passw)
-        execInput(printWelcome(False))
+        execInput(printWelcome(False, True), True, True)
     elif (selection is '2'):
         clear()
         t.getRoster(userName, passw)
+        print("\n")
+        execInput(printWelcome(False, True), True, True)
     
 
 
