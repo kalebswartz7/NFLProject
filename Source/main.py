@@ -9,172 +9,237 @@ import requests
 import os
 import sys
 
-""" Gets username and password as credentials to acccess the API - Hidden ;) """
 
-def getCredentials():
+def get_credentials():
+    """
+    Gets username and password as credentials to acccess the API - Hidden ;)
+
+    """
     with open('secret.txt') as f:
         lines = f.readlines()
         return lines
 
 
-userName = getCredentials()[0].strip()
-passw = getCredentials()[1].strip()
-allTeams = {}
-createdTeam = "Bengals"
+def generate_teams():
+    """
+    Accesses the API to get a team (City + Name) and pairs that with the team's
+    abbreviation in a dictionary
 
-
-""" Accesses the API to get a team (City + Name) and pairs that with the team's abbreviation in a dictionary as the JSON URL's use the 
-    team's abbreviations """
-
-def generateTeams():
+    """
     try:
         response = requests.get(
-            url="https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/conference_team_standings.json?teamstats=W,L,T,PF,PA",
+            url="https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/"
+                "conference_team_standings.json?teamstats=W,L,T,PF,PA",
             params={
             },
             headers={
-                "Authorization": "Basic " + base64.b64encode('{}:{}'.format(userName,passw).encode('utf-8')).decode('ascii')
+                "Authorization": "Basic " + base64.b64encode
+                ('{}:{}'.format(user_name,passw).encode('utf-8')).decode('ascii')
             }
         )
         data = response.json()
         for j in range(0, 2):
             for i in range(0, 16):
-                team = (data['conferenceteamstandings']['conference'][j]['teamentry'][i]['team']['City']) + " "
-                team += (data['conferenceteamstandings']['conference'][j]['teamentry'][i]['team']['Name'])
-                abbreviation = (data['conferenceteamstandings']['conference'][j]['teamentry'][i]['team']['Abbreviation'])
+                team = (data['conferenceteamstandings']['conference'][j]
+                ['teamentry'][i]['team']['City']) + " "
+                team += (data['conferenceteamstandings']['conference'][j]
+                ['teamentry'][i]['team']['Name'])
+                abbreviation = (data['conferenceteamstandings']['conference'][j]
+                ['teamentry'][i]['team']['Abbreviation'])
                 allTeams[team] = abbreviation
         
     except requests.exceptions.RequestException:
         print('HTTP Request failed')
 
 
-"""" This is what is first printed / asked when the program starts. This function gets called repeatedly however to give the user
-     more options after the data they want is already found. """ 
+def print_welcome(opening = True, team_selected = False):
+    """"
+    Prints the welcome when the program is first started, also gives user
+    options at other times during execution
 
-def printWelcome(opening = True, currentTeam = False):
-    if (opening):
+    Paramters
+    ---------
+    opening : bool
+        whether or not the opening message should be displayed
+    team_selected : bool
+        whether or not a team has already been selected so that the option to
+        stay with the current team is available
+
+    """
+    if opening:
         print("############ Welcome to the NFL Statistic Book ############ \n\n")
-    if (currentTeam == True):
+    if team_selected is True:
         print("(0) Stay with current team")
 
     print("(1) Search for a specific team")
     print("(2) Get a list of teams to choose from")
     print("(3) Quit")
-    return getFirstSelection()
+    return get_selection()
 
 
-""" This method just gets the input from the user in printWelcome() """
+def get_selection():
+    """
+    Gets user selection after input options displayed
 
-def getFirstSelection():
-    selection = input("\nSelection: ")
-    return selection
+    """
+    choice = input("\nSelection: ")
+    return choice
 
 
-""" This method takes the input from the user recieved in getFirstSelection() and decides what to do with that input depending on 
-    what the user entered """
+def exec_input(selection, current_team, to_clear = True, team_selected = False):
+    """
+    Gets input from user based on previous selection
 
-def execInput(selection, toClear = True, currentTeam = False):
-    if (selection == '1'):
-        if (toClear):
+    Parameters
+    ----------
+    selection : string
+        input from user when given previous options
+    created_team :
+
+    """
+    if selection is '1':
+        if to_clear:
            clear()
-           teamName = input("Please enter team name: ")
+           team_name = input("Please enter team name: ")
         else:
-            teamName = input("\nPlease enter team name: ")
-        if isTeam(teamName):
-            global createdTeam
-            createdTeam = teamName
-            createTeam(getAbbreviation(teamName))
+            team_name = input("\nPlease enter team name: ")
+        if is_team(team_name):
+            current_team = team_name
+            create_team(get_abbreviation(team_name))
             
         else:
-            execInput('1', False)
+            exec_input('1', current_team, False)
 
-    elif (selection == '0' and currentTeam == True):
-        print(createdTeam)
-        if isTeam(createdTeam):
-            createTeam(getAbbreviation(createdTeam))
+    elif selection is '0' and team_selected is True:
+        create_team(current_team)
 
-    elif (selection == '2'):
+    elif selection is '2':
         clear()
         print("Available teams: \n")
-        printTeams()
-        execInput('1', False)
+        print_teams()
+        exec_input('1', False)
     
-    elif (selection == '3'):
+    elif selection == '3':
         clear()
         sys.exit("Have a great day")
 
-
     else:
-        execInput(getFirstSelection())
+        exec_input(get_selection())
 
 
-""" Creates a Team with a team's corresponding abbreviation for easy access in the API """
+def create_team(team_abbreviation):
+    """
+    Creates a team in the team class
 
-def createTeam(teamAbbreviation):
-    t = Team(teamAbbreviation)
-    getTeamOptions(t)
+    Paramters
+    ---------
+    team_abbreviation : string
+        abbreviation for the team to locate it in API
+    """
+    t = Team(team_abbreviation)
+    get_team_options(t)
 
-
-""" Clears window """
 
 def clear():
+    """
+    Clears window
+
+    """
     os.system( 'clear' )
 
 
-""" Prints all Teams from the dictionary available to choose in the program """
+def print_teams():
+    """
+    Prints all teams available for user to choose from
 
-def printTeams():
+    """
     count = 0
-    teamString = ""
+    team_string = ""
     for key in allTeams:
         count = count + 1
-        teamString += key + " " * (25 - len(key))
+        team_string += key + " " * (25 - len(key))
         if (count % 5 == 0):
-            teamString += "\n"
-    print(teamString)
+            team_string += "\n"
+    print(team_string)
 
 
-""" Determines whether or not the user input a real team name / city """  
+def is_team(team_name):
+    """
+    Determines whether or not team entered by user is actually real
 
-def isTeam(teamName):
+    Paramters
+    ---------
+    team_name : string
+        name of team entered by user
+
+    Notes
+    -----
+    User does not need to enter entire name for team, function is meant to
+    recognize both cities and actual team names
+    """
     for key in allTeams:
-        if teamName.lower() in key.lower() and len(teamName) >= 4:
+        if team_name.lower() in key.lower() and len(team_name) >= 4:
             return True
     return False
 
 
-""" Gets the abbreviation of a correspnding team name """ 
+def get_abbreviation(team_name):
+    """
+    Gets abbreviation for corresponding team name
 
-def getAbbreviation(teamName):
+    Parameters
+    ----------
+    team_name : string
+        team_name searched for corresponding abbreviation
+        
+    """
     for key in allTeams:
-        if teamName.lower() in key.lower() and len(teamName) >= 4:
+        if team_name.lower() in key.lower() and len(team_name) >= 4:
             return allTeams[key]
 
 
-""" Once a user successfully selects a team, these new options are displayed """
+def get_team_options(team):
+    """
+    Display user options once a team has been selected
 
-def getTeamOptions(t):
+    Parameters
+    ----------
+    team : Team
+        Team object that is created once verified to be real, all options given
+        correspond to specific team
+
+    """
     clear()
-    print("TEAM SELECTED: " + t.getName() + "\n\n" + "(1) Get 2018-2019 Schedule\n(2) Get Roster\n(3) Choose another team ")
-    selection = input("\n Selection: ")
-    if (selection is '3'):
+    print(f'TEAM SELECTED: {team.getName()} \n\n(1) Get 2018-2019 Schedule\n(2)'
+          f' Get Roster\n(3) Choose another team ')
+    choice = input("\n Selection: ")
+
+    if choice is '3':
         clear()
-        execInput(printWelcome(False))
-    elif (selection is '1'):
+        print('\n')
+        exec_input('1', current_team=team.name)
+
+    elif choice is '1':
         clear()
-        t.getSchedule(userName, passw)
-        execInput(printWelcome(False, True), True, True)
-    elif (selection is '2'):
+        team.getSchedule(user_name, passw)
+        print('\n')
+        exec_input(print_welcome(opening=False, team_selected=True),
+                   current_team=team.name, to_clear=True, team_selected=True)
+
+    elif choice is '2':
         clear()
-        t.getRoster(userName, passw)
-        print("\n")
-        execInput(printWelcome(False, True), True, True)
+        team.getRoster(user_name, passw)
+        print('\n')
+        exec_input(print_welcome(opening=False, team_selected=True),
+                   current_team=team.name, to_clear=True, team_selected=True)
     
 
-
-
-""" Main """
-generateTeams()
-selection = printWelcome()  
-execInput(selection)  
+if __name__ == '__main__':
+    user_name = get_credentials()[0].strip()
+    passw = get_credentials()[1].strip()
+    allTeams = {}
+    team_selected = "Bengals"
+    generate_teams()
+    selection = print_welcome()
+    exec_input(selection, team_selected)
 
