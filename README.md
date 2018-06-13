@@ -1,6 +1,13 @@
 # NFLProject
 NFL Personal Project - Accessing an API (Python) 
 
+
+# Please view repo: nfl-statistic-book for full project with package download 
+
+
+
+
+
 What this project can do: 
 - Access the MySportsFeed API to get all data 
 - User can view any NFL team's upcoming 2018 schedule 
