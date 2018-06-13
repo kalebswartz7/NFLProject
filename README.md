@@ -2,7 +2,7 @@
 NFL Personal Project - Accessing an API (Python) 
 
 
-# Please view repo: nfl-statistic-book for full project with package download 
+# Please view repo: [nfl-statistic-book](https://github.com/kalebswartz7/nfl-statistic-book) for full project with package download 
 
 
 
