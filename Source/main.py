@@ -28,12 +28,12 @@ def generate_teams():
     """
     try:
         response = requests.get(
-            url="https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/"
-                "conference_team_standings.json?teamstats=W,L,T,PF,PA",
+            url='https://api.mysportsfeeds.com/v1.2/pull/nfl/2018-regular/'
+                'conference_team_standings.json?teamstats=W,L,T,PF,PA',
             params={
             },
             headers={
-                "Authorization": "Basic " + base64.b64encode
+                'Authorization': 'Basic ' + base64.b64encode
                 ('{}:{}'.format(user_name,passw).encode('utf-8')).decode('ascii')
             }
         )
@@ -41,7 +41,7 @@ def generate_teams():
         for j in range(0, 2):
             for i in range(0, 16):
                 team = (data['conferenceteamstandings']['conference'][j]
-                ['teamentry'][i]['team']['City']) + " "
+                ['teamentry'][i]['team']['City']) + ' '
                 team += (data['conferenceteamstandings']['conference'][j]
                 ['teamentry'][i]['team']['Name'])
                 abbreviation = (data['conferenceteamstandings']['conference'][j]
@@ -67,13 +67,13 @@ def print_welcome(opening = True, team_selected = False):
 
     """
     if opening:
-        print("############ Welcome to the NFL Statistic Book ############ \n\n")
+        print('############ Welcome to the NFL Statistic Book ############ \n\n')
     if team_selected is True:
-        print("(0) Stay with current team")
+        print('(0) Stay with current team')
 
-    print("(1) Search for a specific team")
-    print("(2) Get a list of teams to choose from")
-    print("(3) Quit")
+    print('(1) Search for a specific team')
+    print('(2) Get a list of teams to choose from')
+    print('(3) Quit')
     return get_selection()
 
 
@@ -82,7 +82,7 @@ def get_selection():
     Gets user selection after input options displayed
 
     """
-    choice = input("\nSelection: ")
+    choice = input('\nSelection: ')
     return choice
 
 
@@ -100,9 +100,9 @@ def exec_input(selection, current_team, to_clear = True, team_selected = False):
     if selection is '1':
         if to_clear:
            clear()
-           team_name = input("Please enter team name: ")
+           team_name = input('Please enter team name: ')
         else:
-            team_name = input("\nPlease enter team name: ")
+            team_name = input('\nPlease enter team name: ')
         if is_team(team_name):
             current_team = team_name
             create_team(get_abbreviation(team_name))
@@ -115,13 +115,13 @@ def exec_input(selection, current_team, to_clear = True, team_selected = False):
 
     elif selection is '2':
         clear()
-        print("Available teams: \n")
+        print('Available teams: \n')
         print_teams()
         exec_input('1', False)
     
-    elif selection == '3':
+    elif selection is '3':
         clear()
-        sys.exit("Have a great day")
+        sys.exit('Have a great day')
 
     else:
         exec_input(get_selection())
@@ -154,12 +154,12 @@ def print_teams():
 
     """
     count = 0
-    team_string = ""
+    team_string = ''
     for key in allTeams:
         count = count + 1
-        team_string += key + " " * (25 - len(key))
-        if (count % 5 == 0):
-            team_string += "\n"
+        team_string += key + ' ' * (25 - len(key))
+        if count % 5 == 0:
+            team_string += '\n'
     print(team_string)
 
 
@@ -191,7 +191,7 @@ def get_abbreviation(team_name):
     ----------
     team_name : string
         team_name searched for corresponding abbreviation
-        
+
     """
     for key in allTeams:
         if team_name.lower() in key.lower() and len(team_name) >= 4:
@@ -210,9 +210,9 @@ def get_team_options(team):
 
     """
     clear()
-    print(f'TEAM SELECTED: {team.getName()} \n\n(1) Get 2018-2019 Schedule\n(2)'
+    print(f'TEAM SELECTED: {team.get_name()} \n\n(1) Get 2018-2019 Schedule\n(2)'
           f' Get Roster\n(3) Choose another team ')
-    choice = input("\n Selection: ")
+    choice = input('\n Selection: ')
 
     if choice is '3':
         clear()
@@ -221,14 +221,14 @@ def get_team_options(team):
 
     elif choice is '1':
         clear()
-        team.getSchedule(user_name, passw)
+        team.get_schedule(user_name, passw)
         print('\n')
         exec_input(print_welcome(opening=False, team_selected=True),
                    current_team=team.name, to_clear=True, team_selected=True)
 
     elif choice is '2':
         clear()
-        team.getRoster(user_name, passw)
+        team.get_roster(user_name, passw)
         print('\n')
         exec_input(print_welcome(opening=False, team_selected=True),
                    current_team=team.name, to_clear=True, team_selected=True)
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     user_name = get_credentials()[0].strip()
     passw = get_credentials()[1].strip()
     allTeams = {}
-    team_selected = "Bengals"
+    team_selected = 'Bengals'
     generate_teams()
     selection = print_welcome()
     exec_input(selection, team_selected)
